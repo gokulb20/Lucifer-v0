@@ -1,7 +1,10 @@
 import { Message } from "@/types";
 import { GrokChat, GrokStream } from "@/utils";
 import { searchMemories, addToMemory, formatMemoriesForPrompt } from "@/lib/memory";
-import { getGrokTools, executeTool, isKlavisConfigured } from "@/lib/klavis";
+import { getKlavisTools, executeKlavisTool, isKlavisConfigured } from "@/lib/klavis";
+import { getWeatherTools, executeWeatherTool, isWeatherConfigured } from "@/lib/weather";
+import { getSearchTools, executeSearchTool, isTavilyConfigured } from "@/lib/tavily";
+import { getNewsTools, executeNewsTool, isNewsConfigured } from "@/lib/news";
 
 export const config = {
   runtime: "edge"
@@ -45,8 +48,21 @@ const handler = async (req: Request): Promise<Response> => {
       }
     }
 
-    // Get tools if Klavis is configured
-    const tools = isKlavisConfigured() ? getGrokTools() : undefined;
+    // Collect all available tools
+    const tools: any[] = [];
+
+    if (isKlavisConfigured()) {
+      tools.push(...getKlavisTools());
+    }
+    if (isWeatherConfigured()) {
+      tools.push(...getWeatherTools());
+    }
+    if (isTavilyConfigured()) {
+      tools.push(...getSearchTools());
+    }
+    if (isNewsConfigured()) {
+      tools.push(...getNewsTools());
+    }
 
     // If we have tools, use the agentic loop
     if (tools && tools.length > 0) {
@@ -89,9 +105,21 @@ const handler = async (req: Request): Promise<Response> => {
         for (const toolCall of assistantMessage.tool_calls) {
           try {
             const args = JSON.parse(toolCall.function.arguments);
-            console.log(`Executing tool: ${toolCall.function.name}`, args);
+            const toolName = toolCall.function.name;
+            console.log(`Executing tool: ${toolName}`, args);
 
-            const result = await executeTool(toolCall.function.name, args);
+            // Route to correct tool handler
+            let result: string;
+            if (toolName.startsWith("weather_")) {
+              result = await executeWeatherTool(toolName, args);
+            } else if (toolName === "web_search") {
+              result = await executeSearchTool(toolName, args);
+            } else if (toolName.startsWith("news_")) {
+              result = await executeNewsTool(toolName, args);
+            } else {
+              // Klavis tools (gmail_, gcalendar_, github_, drive_, linkedin_, outlook_, discord_, instagram_)
+              result = await executeKlavisTool(toolName, args);
+            }
 
             // Add tool result message
             workingMessages.push({

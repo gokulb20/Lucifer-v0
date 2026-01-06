@@ -66,24 +66,96 @@ export default function Settings() {
             </a>
           </div>
 
-          {/* Available tools */}
+          {/* Klavis tools */}
           <div className="mt-8">
             <h3 className="font-medium text-neutral-900 dark:text-white mb-4">
-              Available Tools
+              Klavis Tools (OAuth)
             </h3>
-            <div className="space-y-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="flex items-center p-3 rounded-lg bg-neutral-100 dark:bg-neutral-800">
                 <span className="text-xl mr-3">📧</span>
                 <div>
                   <p className="font-medium text-neutral-900 dark:text-white">Gmail</p>
-                  <p className="text-sm text-neutral-500">Search emails, read messages</p>
+                  <p className="text-sm text-neutral-500">Search, read, send emails</p>
                 </div>
               </div>
               <div className="flex items-center p-3 rounded-lg bg-neutral-100 dark:bg-neutral-800">
                 <span className="text-xl mr-3">📅</span>
                 <div>
                   <p className="font-medium text-neutral-900 dark:text-white">Google Calendar</p>
-                  <p className="text-sm text-neutral-500">Check schedule, find availability</p>
+                  <p className="text-sm text-neutral-500">Check schedule, create events</p>
+                </div>
+              </div>
+              <div className="flex items-center p-3 rounded-lg bg-neutral-100 dark:bg-neutral-800">
+                <span className="text-xl mr-3">💻</span>
+                <div>
+                  <p className="font-medium text-neutral-900 dark:text-white">GitHub</p>
+                  <p className="text-sm text-neutral-500">Repos, issues, PRs</p>
+                </div>
+              </div>
+              <div className="flex items-center p-3 rounded-lg bg-neutral-100 dark:bg-neutral-800">
+                <span className="text-xl mr-3">📁</span>
+                <div>
+                  <p className="font-medium text-neutral-900 dark:text-white">Google Drive</p>
+                  <p className="text-sm text-neutral-500">Search, list, read files</p>
+                </div>
+              </div>
+              <div className="flex items-center p-3 rounded-lg bg-neutral-100 dark:bg-neutral-800">
+                <span className="text-xl mr-3">💼</span>
+                <div>
+                  <p className="font-medium text-neutral-900 dark:text-white">LinkedIn</p>
+                  <p className="text-sm text-neutral-500">Profile, post updates</p>
+                </div>
+              </div>
+              <div className="flex items-center p-3 rounded-lg bg-neutral-100 dark:bg-neutral-800">
+                <span className="text-xl mr-3">📬</span>
+                <div>
+                  <p className="font-medium text-neutral-900 dark:text-white">Outlook</p>
+                  <p className="text-sm text-neutral-500">Search, read, send emails</p>
+                </div>
+              </div>
+              <div className="flex items-center p-3 rounded-lg bg-neutral-100 dark:bg-neutral-800">
+                <span className="text-xl mr-3">💬</span>
+                <div>
+                  <p className="font-medium text-neutral-900 dark:text-white">Discord</p>
+                  <p className="text-sm text-neutral-500">Servers, channels, messages</p>
+                </div>
+              </div>
+              <div className="flex items-center p-3 rounded-lg bg-neutral-100 dark:bg-neutral-800">
+                <span className="text-xl mr-3">📷</span>
+                <div>
+                  <p className="font-medium text-neutral-900 dark:text-white">Instagram</p>
+                  <p className="text-sm text-neutral-500">Profile, posts</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Direct API tools */}
+          <div className="mt-8">
+            <h3 className="font-medium text-neutral-900 dark:text-white mb-4">
+              Direct API Tools
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="flex items-center p-3 rounded-lg bg-neutral-100 dark:bg-neutral-800">
+                <span className="text-xl mr-3">🔍</span>
+                <div>
+                  <p className="font-medium text-neutral-900 dark:text-white">Web Search</p>
+                  <p className="text-sm text-neutral-500">Search the internet (Tavily)</p>
+                </div>
+              </div>
+              <div className="flex items-center p-3 rounded-lg bg-neutral-100 dark:bg-neutral-800">
+                <span className="text-xl mr-3">📰</span>
+                <div>
+                  <p className="font-medium text-neutral-900 dark:text-white">News</p>
+                  <p className="text-sm text-neutral-500">Headlines, search articles</p>
+                </div>
+              </div>
+              <div className="flex items-center p-3 rounded-lg bg-neutral-100 dark:bg-neutral-800">
+                <span className="text-xl mr-3">🌤️</span>
+                <div>
+                  <p className="font-medium text-neutral-900 dark:text-white">Weather</p>
+                  <p className="text-sm text-neutral-500">Current conditions, forecast</p>
                 </div>
               </div>
             </div>
