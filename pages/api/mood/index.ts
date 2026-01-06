@@ -1,55 +1,51 @@
-// Mood API - Log and retrieve mood
+// Mood API - Log and retrieve mood entries
 import type { NextApiRequest, NextApiResponse } from "next";
 import { addToMemory } from "@/lib/memory";
-
-// In-memory store (use database in production)
-let moodHistory: Array<{
-  id: string;
-  mood: number; // 1-5 scale
-  energy: number; // 1-5 scale
-  note?: string;
-  timestamp: string;
-}> = [];
+import { getMoodEntries, logMood, isSupabaseConfigured } from "@/lib/supabase";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method === "GET") {
-    // Get mood history (last 30 entries)
-    const history = moodHistory.slice(-30);
-    return res.status(200).json({ history });
+  if (!isSupabaseConfigured()) {
+    return res.status(500).json({ error: "Supabase not configured" });
   }
 
-  if (req.method === "POST") {
-    const { mood, energy, note } = req.body;
-
-    if (!mood || mood < 1 || mood > 5) {
-      return res.status(400).json({ error: "Mood must be 1-5" });
+  try {
+    if (req.method === "GET") {
+      const limit = parseInt(req.query.limit as string) || 30;
+      const entries = await getMoodEntries(limit);
+      return res.status(200).json({ entries });
     }
 
-    const entry = {
-      id: `mood_${Date.now()}`,
-      mood,
-      energy: energy || 3,
-      note,
-      timestamp: new Date().toISOString(),
-    };
+    if (req.method === "POST") {
+      const { mood, energy, notes } = req.body;
 
-    moodHistory.push(entry);
+      if (!mood || mood < 1 || mood > 5) {
+        return res.status(400).json({ error: "Mood must be between 1-5" });
+      }
 
-    // Store in memory for context
-    if (process.env.MEM0_API_KEY) {
-      const moodLabels = ["terrible", "bad", "okay", "good", "great"];
-      const energyLabels = ["exhausted", "tired", "moderate", "energized", "pumped"];
+      if (energy && (energy < 1 || energy > 5)) {
+        return res.status(400).json({ error: "Energy must be between 1-5" });
+      }
 
-      await addToMemory([
-        {
-          role: "user",
-          content: `Mood check: feeling ${moodLabels[mood - 1]}, energy is ${energyLabels[(energy || 3) - 1]}${note ? `. ${note}` : ""}`,
-        },
-      ]);
+      const entry = await logMood(mood, energy, notes);
+
+      // Store in memory for context
+      if (process.env.MEM0_API_KEY) {
+        const moodLabels = ["terrible", "bad", "okay", "good", "great"];
+        const moodText = moodLabels[mood - 1];
+        const energyText = energy ? `, energy: ${["very low", "low", "medium", "high", "very high"][energy - 1]}` : "";
+        const notesText = notes ? `. ${notes}` : "";
+
+        await addToMemory([
+          { role: "system", content: `Gokul's mood check: feeling ${moodText}${energyText}${notesText}` },
+        ]);
+      }
+
+      return res.status(201).json({ entry });
     }
 
-    return res.status(201).json({ entry });
+    return res.status(405).json({ error: "Method not allowed" });
+  } catch (error) {
+    console.error("Mood API error:", error);
+    return res.status(500).json({ error: "Database error" });
   }
-
-  return res.status(405).json({ error: "Method not allowed" });
 }
