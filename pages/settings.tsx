@@ -131,6 +131,26 @@ export default function Settings() {
             </div>
           </div>
 
+          {/* Spotify */}
+          <div className="mt-8 p-6 rounded-lg border border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/20">
+            <div className="flex items-center mb-2">
+              <span className="text-xl mr-3">🎵</span>
+              <h3 className="font-medium text-neutral-900 dark:text-white">
+                Spotify
+              </h3>
+            </div>
+            <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-4">
+              Control playback, search music, see what&apos;s playing. Requires one-time authentication.
+            </p>
+            <a
+              href="/api/spotify/auth"
+              className="inline-flex items-center px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+            >
+              Connect Spotify
+              <IconExternalLink className="h-4 w-4 ml-2" />
+            </a>
+          </div>
+
           {/* Direct API tools */}
           <div className="mt-8">
             <h3 className="font-medium text-neutral-900 dark:text-white mb-4">

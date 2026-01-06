@@ -5,6 +5,7 @@ import { getKlavisTools, executeKlavisTool, isKlavisConfigured } from "@/lib/kla
 import { getWeatherTools, executeWeatherTool, isWeatherConfigured } from "@/lib/weather";
 import { getSearchTools, executeSearchTool, isTavilyConfigured } from "@/lib/tavily";
 import { getNewsTools, executeNewsTool, isNewsConfigured } from "@/lib/news";
+import { getSpotifyTools, executeSpotifyTool, isSpotifyConfigured } from "@/lib/spotify";
 
 export const config = {
   runtime: "edge"
@@ -53,6 +54,9 @@ const handler = async (req: Request): Promise<Response> => {
 
     if (isKlavisConfigured()) {
       tools.push(...getKlavisTools());
+    }
+    if (isSpotifyConfigured()) {
+      tools.push(...getSpotifyTools());
     }
     if (isWeatherConfigured()) {
       tools.push(...getWeatherTools());
@@ -110,7 +114,9 @@ const handler = async (req: Request): Promise<Response> => {
 
             // Route to correct tool handler
             let result: string;
-            if (toolName.startsWith("weather_")) {
+            if (toolName.startsWith("spotify_")) {
+              result = await executeSpotifyTool(toolName, args);
+            } else if (toolName.startsWith("weather_")) {
               result = await executeWeatherTool(toolName, args);
             } else if (toolName === "web_search") {
               result = await executeSearchTool(toolName, args);
