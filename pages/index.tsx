@@ -8,11 +8,24 @@ import { useEffect, useRef, useState } from "react";
 export default function Home() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
+  const [darkMode, setDarkMode] = useState<boolean>(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const handleToggleDarkMode = () => {
+    const newMode = !darkMode;
+    setDarkMode(newMode);
+    localStorage.setItem("darkMode", JSON.stringify(newMode));
+
+    if (newMode) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
   };
 
   const handleSend = async (message: Message) => {
@@ -80,7 +93,7 @@ export default function Home() {
     setMessages([
       {
         role: "assistant",
-        content: `Hi there! I'm Chatbot UI, an AI assistant. I can help you with things like answering questions, providing information, and helping with tasks. How can I help you?`
+        content: `What's up.`
       }
     ]);
   };
@@ -89,11 +102,23 @@ export default function Home() {
     scrollToBottom();
   }, [messages]);
 
+  // Load dark mode preference and initial message on mount
   useEffect(() => {
+    // Load dark mode from localStorage
+    const savedDarkMode = localStorage.getItem("darkMode");
+    if (savedDarkMode !== null) {
+      const isDark = JSON.parse(savedDarkMode);
+      setDarkMode(isDark);
+      if (isDark) {
+        document.documentElement.classList.add("dark");
+      }
+    }
+
+    // Set initial message
     setMessages([
       {
         role: "assistant",
-        content: `Hi there! I'm Chatbot UI, an AI assistant. I can help you with things like answering questions, providing information, and helping with tasks. How can I help you?`
+        content: `What's up.`
       }
     ]);
   }, []);
@@ -101,10 +126,10 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Chatbot UI</title>
+        <title>Lucifer</title>
         <meta
           name="description"
-          content="A simple chatbot starter kit for OpenAI's chat model using Next.js, TypeScript, and Tailwind CSS."
+          content="Lucifer - Your AI weapon"
         />
         <meta
           name="viewport"
@@ -116,8 +141,8 @@ export default function Home() {
         />
       </Head>
 
-      <div className="flex flex-col h-screen">
-        <Navbar />
+      <div className="flex flex-col h-screen bg-white dark:bg-neutral-900 transition-colors">
+        <Navbar darkMode={darkMode} onToggleDarkMode={handleToggleDarkMode} />
 
         <div className="flex-1 overflow-auto sm:px-10 pb-4 sm:pb-10">
           <div className="max-w-[800px] mx-auto mt-4 sm:mt-12">
