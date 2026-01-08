@@ -102,8 +102,9 @@ export async function callKlavisTool(
 }
 
 // Define tools for Grok in OpenAI function calling format
-export function getGrokTools() {
+export function getKlavisTools() {
   return [
+    // Gmail tools
     {
       type: "function",
       function: {
@@ -185,6 +186,7 @@ export function getGrokTools() {
         },
       },
     },
+    // Google Calendar tools
     {
       type: "function",
       function: {
@@ -243,11 +245,334 @@ export function getGrokTools() {
         },
       },
     },
+    // GitHub tools
+    {
+      type: "function",
+      function: {
+        name: "github_list_repos",
+        description: "List your GitHub repositories.",
+        parameters: {
+          type: "object",
+          properties: {
+            type: {
+              type: "string",
+              enum: ["all", "owner", "public", "private"],
+              description: "Type of repos to list (default: all)",
+            },
+          },
+          required: [],
+        },
+      },
+    },
+    {
+      type: "function",
+      function: {
+        name: "github_list_issues",
+        description: "List issues for a repository.",
+        parameters: {
+          type: "object",
+          properties: {
+            repo: {
+              type: "string",
+              description: "Repository name (owner/repo format)",
+            },
+            state: {
+              type: "string",
+              enum: ["open", "closed", "all"],
+              description: "Issue state filter (default: open)",
+            },
+          },
+          required: ["repo"],
+        },
+      },
+    },
+    {
+      type: "function",
+      function: {
+        name: "github_list_prs",
+        description: "List pull requests for a repository.",
+        parameters: {
+          type: "object",
+          properties: {
+            repo: {
+              type: "string",
+              description: "Repository name (owner/repo format)",
+            },
+            state: {
+              type: "string",
+              enum: ["open", "closed", "all"],
+              description: "PR state filter (default: open)",
+            },
+          },
+          required: ["repo"],
+        },
+      },
+    },
+    {
+      type: "function",
+      function: {
+        name: "github_create_issue",
+        description: "Create a new issue in a repository. Only use when explicitly asked.",
+        parameters: {
+          type: "object",
+          properties: {
+            repo: {
+              type: "string",
+              description: "Repository name (owner/repo format)",
+            },
+            title: {
+              type: "string",
+              description: "Issue title",
+            },
+            body: {
+              type: "string",
+              description: "Issue body/description",
+            },
+          },
+          required: ["repo", "title"],
+        },
+      },
+    },
+    // Google Drive tools
+    {
+      type: "function",
+      function: {
+        name: "drive_search",
+        description: "Search for files in Google Drive.",
+        parameters: {
+          type: "object",
+          properties: {
+            query: {
+              type: "string",
+              description: "Search query for file names or content",
+            },
+          },
+          required: ["query"],
+        },
+      },
+    },
+    {
+      type: "function",
+      function: {
+        name: "drive_list_files",
+        description: "List files in Google Drive, optionally in a specific folder.",
+        parameters: {
+          type: "object",
+          properties: {
+            folderId: {
+              type: "string",
+              description: "Folder ID to list files from (optional, defaults to root)",
+            },
+            maxResults: {
+              type: "number",
+              description: "Maximum number of files to return (default: 10)",
+            },
+          },
+          required: [],
+        },
+      },
+    },
+    {
+      type: "function",
+      function: {
+        name: "drive_read_file",
+        description: "Read the content of a file from Google Drive.",
+        parameters: {
+          type: "object",
+          properties: {
+            fileId: {
+              type: "string",
+              description: "The ID of the file to read",
+            },
+          },
+          required: ["fileId"],
+        },
+      },
+    },
+    // LinkedIn tools
+    {
+      type: "function",
+      function: {
+        name: "linkedin_get_profile",
+        description: "Get your LinkedIn profile information.",
+        parameters: {
+          type: "object",
+          properties: {},
+          required: [],
+        },
+      },
+    },
+    {
+      type: "function",
+      function: {
+        name: "linkedin_post",
+        description: "Create a post on LinkedIn. Only use when explicitly asked.",
+        parameters: {
+          type: "object",
+          properties: {
+            text: {
+              type: "string",
+              description: "The post content",
+            },
+          },
+          required: ["text"],
+        },
+      },
+    },
+    // Outlook Mail tools
+    {
+      type: "function",
+      function: {
+        name: "outlook_search_emails",
+        description: "Search for emails in Outlook.",
+        parameters: {
+          type: "object",
+          properties: {
+            query: {
+              type: "string",
+              description: "Search query for emails",
+            },
+            maxResults: {
+              type: "number",
+              description: "Maximum number of results (default: 10)",
+            },
+          },
+          required: ["query"],
+        },
+      },
+    },
+    {
+      type: "function",
+      function: {
+        name: "outlook_read_email",
+        description: "Read a specific email by its ID.",
+        parameters: {
+          type: "object",
+          properties: {
+            messageId: {
+              type: "string",
+              description: "The ID of the email to read",
+            },
+          },
+          required: ["messageId"],
+        },
+      },
+    },
+    {
+      type: "function",
+      function: {
+        name: "outlook_send_email",
+        description: "Send an email via Outlook. Only use when explicitly asked.",
+        parameters: {
+          type: "object",
+          properties: {
+            to: {
+              type: "array",
+              items: { type: "string" },
+              description: "List of recipient email addresses",
+            },
+            subject: {
+              type: "string",
+              description: "Email subject",
+            },
+            body: {
+              type: "string",
+              description: "Email body content",
+            },
+          },
+          required: ["to", "subject", "body"],
+        },
+      },
+    },
+    // Discord tools
+    {
+      type: "function",
+      function: {
+        name: "discord_list_servers",
+        description: "List Discord servers you're in.",
+        parameters: {
+          type: "object",
+          properties: {},
+          required: [],
+        },
+      },
+    },
+    {
+      type: "function",
+      function: {
+        name: "discord_list_channels",
+        description: "List channels in a Discord server.",
+        parameters: {
+          type: "object",
+          properties: {
+            serverId: {
+              type: "string",
+              description: "The server/guild ID",
+            },
+          },
+          required: ["serverId"],
+        },
+      },
+    },
+    {
+      type: "function",
+      function: {
+        name: "discord_send_message",
+        description: "Send a message to a Discord channel. Only use when explicitly asked.",
+        parameters: {
+          type: "object",
+          properties: {
+            channelId: {
+              type: "string",
+              description: "The channel ID to send to",
+            },
+            content: {
+              type: "string",
+              description: "Message content",
+            },
+          },
+          required: ["channelId", "content"],
+        },
+      },
+    },
+    // Instagram tools
+    {
+      type: "function",
+      function: {
+        name: "instagram_get_profile",
+        description: "Get your Instagram profile information.",
+        parameters: {
+          type: "object",
+          properties: {},
+          required: [],
+        },
+      },
+    },
+    {
+      type: "function",
+      function: {
+        name: "instagram_get_posts",
+        description: "Get your recent Instagram posts.",
+        parameters: {
+          type: "object",
+          properties: {
+            limit: {
+              type: "number",
+              description: "Number of posts to retrieve (default: 10)",
+            },
+          },
+          required: [],
+        },
+      },
+    },
   ];
 }
 
+// Backwards compatibility alias
+export const getGrokTools = getKlavisTools;
+
 // Execute a tool call from Grok
-export async function executeTool(
+export async function executeKlavisTool(
   toolName: string,
   args: Record<string, unknown>
 ): Promise<string> {
@@ -261,14 +586,31 @@ export async function executeTool(
     klavisToolName = toolName;
   } else if (toolName.startsWith("gcalendar_")) {
     serverName = "Google Calendar";
-    // Map our tool names to Klavis tool names
     const toolMap: Record<string, string> = {
       gcalendar_list_events: "list_events",
       gcalendar_create_event: "create_event",
     };
     klavisToolName = toolMap[toolName] || toolName.replace("gcalendar_", "");
+  } else if (toolName.startsWith("github_")) {
+    serverName = "GitHub";
+    klavisToolName = toolName.replace("github_", "");
+  } else if (toolName.startsWith("drive_")) {
+    serverName = "Google Drive";
+    klavisToolName = toolName.replace("drive_", "");
+  } else if (toolName.startsWith("linkedin_")) {
+    serverName = "LinkedIn";
+    klavisToolName = toolName.replace("linkedin_", "");
+  } else if (toolName.startsWith("outlook_")) {
+    serverName = "Outlook";
+    klavisToolName = toolName.replace("outlook_", "");
+  } else if (toolName.startsWith("discord_")) {
+    serverName = "Discord";
+    klavisToolName = toolName.replace("discord_", "");
+  } else if (toolName.startsWith("instagram_")) {
+    serverName = "Instagram";
+    klavisToolName = toolName.replace("instagram_", "");
   } else {
-    return JSON.stringify({ error: `Unknown tool: ${toolName}` });
+    return JSON.stringify({ error: `Unknown Klavis tool: ${toolName}` });
   }
 
   // Add defaults for calendar events
@@ -289,3 +631,6 @@ export async function executeTool(
   const result = await callKlavisTool(serverName, klavisToolName, args);
   return JSON.stringify(result, null, 2);
 }
+
+// Backwards compatibility alias
+export const executeTool = executeKlavisTool;
