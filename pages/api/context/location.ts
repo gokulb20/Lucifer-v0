@@ -2,6 +2,10 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { addToMemory } from "@/lib/memory";
 import { getLatestLocation, saveLocation, isSupabaseConfigured } from "@/lib/supabase";
+import { eventTriggers } from "@/lib/triggers";
+import { shouldFireTrigger, getTriggerPriority } from "@/lib/decision";
+import { generateMessage } from "@/lib/message-generator";
+import { deliverTrigger, isPushConfigured } from "@/lib/push";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (!isSupabaseConfigured()) {
@@ -34,6 +38,37 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         await addToMemory([
           { role: "system", content: `Gokul is now at: ${name}` },
         ]);
+      }
+
+      // EVENT TRIGGER: Check location-based triggers
+      if (locationChanged && isPushConfigured()) {
+        try {
+          const triggerResult = await eventTriggers.location_change({ lat, lng, name });
+
+          if (triggerResult.shouldFire) {
+            const decision = await shouldFireTrigger(
+              triggerResult.triggerId as any,
+              triggerResult.context
+            );
+
+            if (decision.shouldFire) {
+              const message = await generateMessage(
+                triggerResult.triggerId as any,
+                triggerResult.context || {}
+              );
+              const priority = getTriggerPriority(triggerResult.triggerId as any);
+              await deliverTrigger(
+                triggerResult.triggerId as any,
+                triggerResult.context || {},
+                message,
+                priority
+              );
+            }
+          }
+        } catch (triggerError) {
+          console.error("Location trigger error:", triggerError);
+          // Don't fail the request if trigger fails
+        }
       }
 
       return res.status(200).json({ success: true, location });
